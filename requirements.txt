@@ -2,5 +2,3 @@ pandas
 streamlit>=1.30.0
 plotly
 numpy
-altair<5.0.0
-imghdr
