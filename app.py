@@ -47,6 +47,10 @@ peaks = cumulative.cummax()
 drawdowns = peaks - cumulative
 max_drawdown = drawdowns.max()
 
+# (BARU) Mengambil indeks titik puncak sebelum drawdown dan titik terendah drawdown
+max_drawdown_idx = drawdowns.idxmax()
+peak_idx_before_dd = peaks[:max_drawdown_idx+1].idxmax()
+
 final_growth = cumulative.iloc[-1]
 total_trades = len(df_trades)
 win_rate = (df_trades['Net_Profit'] > 0).mean() * 100
@@ -85,6 +89,22 @@ fig_growth = px.line(df_trades, x='Time.1', y='Cumulative_Profit',
                      labels={'Time.1': 'Waktu (Close Trade)', 'Cumulative_Profit': 'Saldo ($)'},
                      template="plotly_white")
 fig_growth.update_traces(line=dict(color='#1f77b4', width=2))
+
+# (BARU) Menambahkan Highlight Drawdown di Grafik
+start_dd_time = df_trades['Time.1'].iloc[peak_idx_before_dd]
+end_dd_time = df_trades['Time.1'].iloc[max_drawdown_idx]
+
+fig_growth.add_vrect(
+    x0=start_dd_time, 
+    x1=end_dd_time,
+    fillcolor="red", 
+    opacity=0.2, 
+    line_width=0,
+    annotation_text="Max Drawdown", 
+    annotation_position="top left",
+    annotation_font_color="red"
+)
+
 st.plotly_chart(fig_growth, use_container_width=True)
 
 # --- BAGIAN 3: ANALISA KEDALAMAN (BAR & PIE CHART) ---
